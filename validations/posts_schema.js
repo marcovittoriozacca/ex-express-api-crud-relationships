@@ -15,7 +15,7 @@ const passedBody = {
     },
     isLength:{
         options: {max:100},
-        errorMessage: "The length of this title is too length - max length is 255 chars"
+        errorMessage: "The length of this title is too long - max length is 100 chars"
     }
     
    },
