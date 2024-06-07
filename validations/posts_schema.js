@@ -1,70 +1,73 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prisma/prismaClient.js');
 
 const passedBody = {
    title: {
     in: ['body'],
-    notEmpty(){
+    notEmpty:{
       errorMessage: "The title is a required field"  
     },
-    isString(){
+    isString:{
         errorMessage: "The title must be a String"
     },
-    isLength(){
-        options: {min:1}
+    isLength:{
+        options: {min:1},
         errorMessage: "The length of this title is too short"
     },
-    isLength(){
-        options: {max:100}
+    isLength:{
+        options: {max:100},
         errorMessage: "The length of this title is too length - max length is 255 chars"
     }
     
    },
    content:{
     in: ['body'],
-    notEmpty(){
+    notEmpty:{
         errorMessage: "The content is a required field"  
       },
-      isString(){
+      isString:{
           errorMessage: "The content must be a String"
       },
-      isLength(){
-          options: {min:1}
+      isLength:{
+          options: {min:1},
           errorMessage: "The length of this content is too short"
       },
    },
    published:{
     in: ['body'],
-    notEmpty(){
+    notEmpty:{
         errorMessage: "You must specify if this post is already published or not"
     },
-    isBoolean(){
+    isBoolean:{
         errorMessage: "This field only accepts true or false"
     }
    },
    categoryId:{
     in: ['body'],
-    isInt(){
-        options: {allow_leading_zeroes: false}
+    isInt:{
+        options: {allow_leading_zeroes: false},
         errorMessage: "The category ID must be an integer"
     },
     custom: {
         options: async (value) => {
+            if(value === undefined){
+                return true;
+            }
+            const categoryId = parseInt(value);
             const matchingId = await prisma.category.findUnique({
-                where: {id: value}
-            })
+                where: {id: categoryId}
+            });
             if(!matchingId){
-                throw new Error(`There's no ID as ${value}.`)
+                throw new Error(`There's no ID as ${categoryId}.`)
             }
             return true;
         }
     }
    },
    tags:{
-    notEmpty(){
+    notEmpty:{
     errorMessage: "You must include at least one tag"
     },
-    isArray(){
+    isArray:{
         errorMessage: "Tags must be passed as array of one or multiple ID"
     },
     custom:{
