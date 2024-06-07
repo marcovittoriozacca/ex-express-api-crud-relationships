@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const posts = require('./routers/posts.js');
+const categories = require('./routers/categories.js');
 const notFoundHandler = require('./middlewares/notFoundHandler.js');
 const errorHandler = require('./middlewares/errorHandler.js');
 const app = express();
@@ -11,6 +12,7 @@ const { HOST } = process.env;
 app.use(express.json());
 
 app.use("/posts", posts);
+app.use("/categories", categories);
 
 app.use(errorHandler);
 app.use(notFoundHandler);
