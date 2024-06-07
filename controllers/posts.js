@@ -155,18 +155,20 @@ const index = async (req, res, next) => {
 }
 
 const update = async (req, res, next) => {
-
     let { slug } = req.params;
 
-
-    let data = req.body;
-    if(data.title){
-        data.slug = makeSlug(data.title);
-    }
-    if(data.id){
-        const err = new Error('You cant edit the field: ID');
-        return next(err);
-    }
+    const {title, image, content, published, categoryId, tags} = req.body;
+    const data = {
+        title,
+        slug: makeSlug(title),
+        image,
+        content,
+        published,
+        categoryId,
+        tags: {
+            set: tags.map(i => ({id: i}))
+        }
+    };
 
     try{
         const upPost = await prisma.post.update({
