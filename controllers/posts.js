@@ -3,14 +3,18 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const store = async (req, res, next) => {
-    const {title, image, content, published} = req.body;
+    const {title, image, content, published, categoryId, tags} = req.body;
     const data = {
         title,
         slug: makeSlug(title),
         image,
         content,
-        published
-    }
+        published,
+        categoryId,
+        tags: {
+            connect: tags.map(i => ({id: i}))
+        }
+    };
     try{
         const nPost = await prisma.post.create({data})
         res.status(200).json({
@@ -31,7 +35,21 @@ const show = async (req, res, next) => {
         const fPost = await prisma.post.findUnique({
             where: {
                 slug: slug
-            }
+            },
+            include: {
+                category: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+                tags: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+            },
         })
         if(!fPost){
             return res.status(404).json({
@@ -92,6 +110,20 @@ const index = async (req, res, next) => {
 
         const postsList = await prisma.post.findMany({
             where,
+            include: {
+                category: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+                tags: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+            },
             take: parseInt(limit),
             skip: offset,
         })
